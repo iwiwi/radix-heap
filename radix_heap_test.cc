@@ -1,3 +1,4 @@
+#include <iostream>
 #include "radix_heap.h"
 #include "gtest/gtest.h"
 using namespace std;
@@ -108,4 +109,32 @@ TEST(radix_heap_test, trivial_decimal) {
 
   ASSERT_EQ(100.0f, h.top());
   h.pop();
+}
+
+TEST(radix_heap_pair_test, trivial) {
+  radix_heap::radix_heap_pair<double, string> h;
+
+  h.push(-100.0, "hoge");
+  h.push(-0.5, "piyo");
+  h.push(0.0, "huga");
+
+  ASSERT_EQ(-100.0, h.top_key());
+  ASSERT_EQ("hoge", h.top_value());
+  h.pop();
+
+  ASSERT_EQ(-0.5, h.top_key());
+  ASSERT_EQ("piyo", h.top_value());
+  h.pop();
+
+  h.push(-0.25, "nya");
+
+  ASSERT_EQ(-0.25, h.top_key());
+  ASSERT_EQ("nya", h.top_value());
+  h.pop();
+
+  ASSERT_EQ(0.0, h.top_key());
+  ASSERT_EQ("huga", h.top_value());
+  h.pop();
+
+  ASSERT_EQ(0, h.size());
 }

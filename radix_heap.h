@@ -4,6 +4,7 @@
 #include <cstdint>
 #include <type_traits>
 #include <vector>
+#include <limits>
 
 namespace radix_heap {
 namespace internal {
@@ -112,8 +113,8 @@ class radix_heap {
   void push(key_type key) {
     const unsigned_key_type x = encoder_type::encode(key);
     assert(last_ <= x);
-    buckets_[internal::find_bucket(x, last_)].emplace_back(x);
     ++size_;
+    buckets_[internal::find_bucket(x, last_)].emplace_back(x);
   }
 
   key_type top() {
@@ -134,19 +135,16 @@ class radix_heap {
   void clear() {
     size_ = 0;
     last_ = key_type();
-    for (int i = 0; i <= num_bits(); ++i) {
+    for (int i = 0; i <= internal::num_bits<unsigned_key_type>(); ++i) {
       buckets_.clear();
     }
   }
 
  private:
-  static constexpr size_t num_bits() {
-    return sizeof(key_type) * CHAR_BIT;
-  }
-
   size_t size_;
   unsigned_key_type last_;
-  std::vector<unsigned_key_type> buckets_[num_bits() + 1];
+  std::vector<unsigned_key_type>
+      buckets_[internal::num_bits<unsigned_key_type>() + 1];
 
   void pull() {
     assert(size_ > 0);
@@ -156,6 +154,85 @@ class radix_heap {
     last_ = *std::min_element(buckets_[i].begin(), buckets_[i].end());
     for (unsigned_key_type x : buckets_[i]) {
       buckets_[internal::find_bucket(x, last_)].emplace_back(x);
+    }
+    buckets_[i].clear();
+  }
+};
+
+template<typename KeyType, typename ValueType, typename EncoderType = internal::encoder<KeyType>>
+class radix_heap_pair {
+ public:
+  typedef KeyType key_type;
+  typedef ValueType value_type;
+  typedef EncoderType encoder_type;
+  typedef typename encoder_type::unsigned_key_type unsigned_key_type;
+
+  radix_heap_pair() : size_(0), last_() {}
+
+  void push(key_type key, const value_type &value) {
+    const unsigned_key_type x = encoder_type::encode(key);
+    assert(last_ <= x);
+    ++size_;
+    buckets_[internal::find_bucket(x, last_)].emplace_back(x, value);
+  }
+
+  void push(key_type key, value_type &&value) {
+    const unsigned_key_type x = encoder_type::encode(key);
+    assert(last_ <= x);
+    ++size_;
+    buckets_[internal::find_bucket(x, last_)].emplace_back(x, std::move(value));
+  }
+
+  // TODO: emplace
+
+  key_type top_key() {
+    pull();
+    return encoder_type::decode(last_);
+  }
+
+  value_type &top_value() {
+    pull();
+    return buckets_[0].back().second;
+  }
+
+  void pop() {
+    pull();
+    buckets_[0].pop_back();
+    --size_;
+  }
+
+  size_t size() const {
+    return size_;
+  }
+
+  void clear() {
+    size_ = 0;
+    last_ = key_type();
+    for (int i = 0; i <= internal::num_bits<unsigned_key_type>(); ++i) {
+      buckets_.clear();
+    }
+  }
+
+ private:
+  size_t size_;
+  unsigned_key_type last_;
+  std::vector<std::pair<unsigned_key_type, value_type>>
+      buckets_[internal::num_bits<unsigned_key_type>() + 1];
+
+  void pull() {
+    assert(size_ > 0);
+    if (!buckets_[0].empty()) return;
+    size_t i;
+    for (i = 1; buckets_[i].empty(); ++i);
+
+    last_ = std::numeric_limits<unsigned_key_type>::max();
+    for (size_t j = 0; j < buckets_[i].size(); ++j) {
+      last_ = std::min(last_, buckets_[i][j].first);
+    }
+
+    for (size_t j = 0; j < buckets_[i].size(); ++j) {
+      const size_t k = internal::find_bucket(buckets_[i][j].first, last_);
+      buckets_[k].emplace_back(std::move(buckets_[i][j]));
     }
     buckets_[i].clear();
   }
