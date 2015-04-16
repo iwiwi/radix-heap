@@ -110,11 +110,6 @@ class radix_heap {
 
   radix_heap() : size_(0), last_(), buckets_() {}
 
-  radix_heap(radix_heap<KeyType, EncoderType> &&a)
-      : size_(0), last_(), buckets_() {
-    swap(a);
-  }
-
   void push(key_type key) {
     const unsigned_key_type x = encoder_type::encode(key);
     assert(last_ <= x);
@@ -145,7 +140,7 @@ class radix_heap {
     size_ = 0;
     last_ = key_type();
     for (int i = 0; i <= internal::num_bits<unsigned_key_type>(); ++i) {
-      buckets_.clear();
+      buckets_[i].clear();
     }
   }
 
@@ -185,11 +180,6 @@ class radix_heap_pair {
   typedef typename encoder_type::unsigned_key_type unsigned_key_type;
 
   radix_heap_pair() : size_(0), last_(), buckets_() {}
-
-  radix_heap_pair(radix_heap_pair<KeyType, ValueType, EncoderType> &&a)
-      : size_(0), last_(), buckets_() {
-    swap(a);
-  }
 
   void push(key_type key, const value_type &value) {
     const unsigned_key_type x = encoder_type::encode(key);
@@ -242,7 +232,7 @@ class radix_heap_pair {
     size_ = 0;
     last_ = key_type();
     for (int i = 0; i <= internal::num_bits<unsigned_key_type>(); ++i) {
-      buckets_.clear();
+      buckets_[i].clear();
     }
   }
 
