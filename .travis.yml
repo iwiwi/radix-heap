@@ -1,0 +1,8 @@
+language: cpp
+
+compiler:
+  - gcc
+  - clang
+
+script:
+  - $CXX -pthread -I. -O3 -Wall -Wextra gtest/gtest*.cc radix_heap_test.cc
