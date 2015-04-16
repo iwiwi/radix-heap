@@ -108,7 +108,12 @@ class radix_heap {
   typedef EncoderType encoder_type;
   typedef typename encoder_type::unsigned_key_type unsigned_key_type;
 
-  radix_heap() : size_(0), last_() {}
+  radix_heap() : size_(0), last_(), buckets_() {}
+
+  radix_heap(radix_heap<KeyType, EncoderType> &&a)
+      : size_(0), last_(), buckets_() {
+    swap(a);
+  }
 
   void push(key_type key) {
     const unsigned_key_type x = encoder_type::encode(key);
@@ -132,11 +137,23 @@ class radix_heap {
     return size_;
   }
 
+  bool empty() const {
+    return size_ == 0;
+  }
+
   void clear() {
     size_ = 0;
     last_ = key_type();
     for (int i = 0; i <= internal::num_bits<unsigned_key_type>(); ++i) {
       buckets_.clear();
+    }
+  }
+
+  void swap(radix_heap<KeyType, EncoderType> &a) {
+    std::swap(size_, a.size_);
+    std::swap(last_, a.last_);
+    for (int i = 0; i <= internal::num_bits<unsigned_key_type>(); ++i) {
+      buckets_[i].swap(a.buckets_[i]);
     }
   }
 
@@ -167,7 +184,12 @@ class radix_heap_pair {
   typedef EncoderType encoder_type;
   typedef typename encoder_type::unsigned_key_type unsigned_key_type;
 
-  radix_heap_pair() : size_(0), last_() {}
+  radix_heap_pair() : size_(0), last_(), buckets_() {}
+
+  radix_heap_pair(radix_heap_pair<KeyType, ValueType, EncoderType> &&a)
+      : size_(0), last_(), buckets_() {
+    swap(a);
+  }
 
   void push(key_type key, const value_type &value) {
     const unsigned_key_type x = encoder_type::encode(key);
@@ -212,11 +234,23 @@ class radix_heap_pair {
     return size_;
   }
 
+  bool empty() const {
+    return size_ == 0;
+  }
+
   void clear() {
     size_ = 0;
     last_ = key_type();
     for (int i = 0; i <= internal::num_bits<unsigned_key_type>(); ++i) {
       buckets_.clear();
+    }
+  }
+
+  void swap(radix_heap_pair<KeyType, ValueType, EncoderType> &a) {
+    std::swap(size_, a.size_);
+    std::swap(last_, a.last_);
+    for (int i = 0; i <= internal::num_bits<unsigned_key_type>(); ++i) {
+      buckets_[i].swap(a.buckets_[i]);
     }
   }
 
