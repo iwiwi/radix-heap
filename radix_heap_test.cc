@@ -138,3 +138,14 @@ TEST(radix_heap_pair_test, trivial) {
 
   ASSERT_EQ(0, h.size());
 }
+
+TEST(radix_heap_pair_test, emplace) {
+  radix_heap::radix_heap_pair<double, string> h;
+  h.emplace(10, "hoge");
+  h.emplace(20, 10, 'a');
+
+  ASSERT_EQ("hoge", h.top_value());
+  h.pop();
+
+  ASSERT_EQ("aaaaaaaaaa", h.top_value());
+}

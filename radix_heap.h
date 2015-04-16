@@ -183,7 +183,14 @@ class radix_heap_pair {
     buckets_[internal::find_bucket(x, last_)].emplace_back(x, std::move(value));
   }
 
-  // TODO: emplace
+  template <class... Args>
+  void emplace(key_type key, Args&&... args) {
+    const unsigned_key_type x = encoder_type::encode(key);
+    assert(last_ <= x);
+    ++size_;
+    buckets_[internal::find_bucket(x, last_)].emplace_back(
+        std::piecewise_construct, std::forward_as_tuple(x), std::forward_as_tuple(args...));
+  }
 
   key_type top_key() {
     pull();
