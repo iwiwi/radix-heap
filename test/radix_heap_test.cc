@@ -32,8 +32,31 @@ typedef Types<unsigned char, char, signed char,
 }  // namespace
 
 template<typename T>
+class encoder_test_all_types : public testing::Test {};
+TYPED_TEST_CASE(encoder_test_all_types, AllTypes);
+
+template<typename T>
 class radix_heap_test_all_types : public testing::Test {};
 TYPED_TEST_CASE(radix_heap_test_all_types, AllTypes);
+
+TYPED_TEST(encoder_test_all_types, extreme) {
+  TypeParam xs[] = {0, numeric_limits<TypeParam>::lowest(), numeric_limits<TypeParam>::max()};
+  for (TypeParam x : xs) {
+    TypeParam y = radix_heap::internal::encoder<TypeParam>::decode
+        (radix_heap::internal::encoder<TypeParam>::encode(x));
+    ASSERT_EQ(x, y);
+  }
+}
+
+TYPED_TEST(encoder_test_all_types, random) {
+  const int kNumTrial = 1000000;
+  for (int i = 0; i < kNumTrial; ++i) {
+    TypeParam x = static_cast<TypeParam>(xorshift64());
+    TypeParam y = radix_heap::internal::encoder<TypeParam>::decode
+        (radix_heap::internal::encoder<TypeParam>::encode(x));
+    ASSERT_EQ(x, y);
+  }
+}
 
 TYPED_TEST(radix_heap_test_all_types, trivial) {
   radix_heap::radix_heap<TypeParam> h;

@@ -5,4 +5,5 @@ compiler:
   - clang
 
 script:
-  - $CXX -pthread -I. -O3 -Wall -Wextra gtest/gtest*.cc radix_heap_test.cc
+  - $CXX -std=c++0x -O3 -Wall -Wextra -pthread -I ./ -I ./test/ test/gtest/gtest*.cc test/radix_heap_test.cc
+  - ./a.out
