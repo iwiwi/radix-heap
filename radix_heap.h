@@ -172,14 +172,14 @@ class radix_heap {
 };
 
 template<typename KeyType, typename ValueType, typename EncoderType = internal::encoder<KeyType>>
-class radix_heap_pair {
+class pair_radix_heap {
  public:
   typedef KeyType key_type;
   typedef ValueType value_type;
   typedef EncoderType encoder_type;
   typedef typename encoder_type::unsigned_key_type unsigned_key_type;
 
-  radix_heap_pair() : size_(0), last_(), buckets_() {}
+  pair_radix_heap() : size_(0), last_(), buckets_() {}
 
   void push(key_type key, const value_type &value) {
     const unsigned_key_type x = encoder_type::encode(key);
@@ -236,7 +236,7 @@ class radix_heap_pair {
     }
   }
 
-  void swap(radix_heap_pair<KeyType, ValueType, EncoderType> &a) {
+  void swap(pair_radix_heap<KeyType, ValueType, EncoderType> &a) {
     std::swap(size_, a.size_);
     std::swap(last_, a.last_);
     for (int i = 0; i <= internal::num_bits<unsigned_key_type>(); ++i) {

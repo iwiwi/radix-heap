@@ -182,8 +182,8 @@ TEST(radix_heap_test_int, large) {
   }
 }
 
-TEST(radix_heap_pair_test, trivial) {
-  radix_heap::radix_heap_pair<double, string> h;
+TEST(pair_radix_heap_test, trivial) {
+  radix_heap::pair_radix_heap<double, string> h;
 
   h.push(-100.0, "hoge");
   h.push(-0.5, "piyo");
@@ -209,8 +209,8 @@ TEST(radix_heap_pair_test, trivial) {
   ASSERT_TRUE(h.empty());
 }
 
-TEST(radix_heap_pair_test_double_string, emplace) {
-  radix_heap::radix_heap_pair<double, string> h;
+TEST(pair_radix_heap_test_double_string, emplace) {
+  radix_heap::pair_radix_heap<double, string> h;
   h.emplace(10, "hoge");
   h.emplace(20, 10, 'a');
   ASSERT_EQ("hoge", h.top_value());
@@ -218,13 +218,13 @@ TEST(radix_heap_pair_test_double_string, emplace) {
   ASSERT_EQ("aaaaaaaaaa", h.top_value());
 }
 
-TEST(radix_heap_pair_test_int_string, large) {
+TEST(pair_radix_heap_test_int_string, large) {
   const int kNumTrials = 10;
   const int kNumPop = 10000;
   const int kMaxDiff = 1000;
   const int kMaxInsert = 10;
 
-  radix_heap::radix_heap_pair<int, string> rh;
+  radix_heap::pair_radix_heap<int, string> rh;
   for (int trial = 0; trial < kNumTrials; ++trial) {
     rh.clear();
     ASSERT_TRUE(rh.empty());
