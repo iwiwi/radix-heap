@@ -22,7 +22,6 @@ class encoder_impl_integer<KeyType, false> {
   typedef KeyType unsigned_key_type;
 
   inline static constexpr unsigned_key_type encode(key_type x) {
-    // puts("UNSIGNED");
     return x;
   }
 
@@ -38,7 +37,6 @@ class encoder_impl_integer<KeyType, true> {
   typedef typename std::make_unsigned<KeyType>::type unsigned_key_type;
 
   inline static constexpr unsigned_key_type encode(key_type x) {
-    //puts("SIGNED");
     return static_cast<unsigned_key_type>(x) ^
         (unsigned_key_type(1) << unsigned_key_type(num_bits<unsigned_key_type>() - 1));
   }
