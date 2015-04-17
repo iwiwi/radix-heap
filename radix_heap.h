@@ -22,6 +22,7 @@ class encoder_impl_integer<KeyType, false> {
   typedef KeyType unsigned_key_type;
 
   inline static constexpr unsigned_key_type encode(key_type x) {
+    // puts("UNSIGNED");
     return x;
   }
 
@@ -37,8 +38,9 @@ class encoder_impl_integer<KeyType, true> {
   typedef typename std::make_unsigned<KeyType>::type unsigned_key_type;
 
   inline static constexpr unsigned_key_type encode(key_type x) {
+    //puts("SIGNED");
     return static_cast<unsigned_key_type>(x) ^
-        (unsigned_key_type(1) << (num_bits<unsigned_key_type>() - 1));
+        (unsigned_key_type(1) << unsigned_key_type(num_bits<unsigned_key_type>() - 1));
   }
 
   inline static constexpr key_type decode(unsigned_key_type x) {
@@ -88,16 +90,11 @@ template<>
 class encoder<double> : public encoder_impl_decimal<double, uint64_t> {};
 
 template<typename T>
-inline size_t find_bucket(T x, T last) {
-  static_assert(std::is_unsigned<T>(), "");
-  x ^= last;
-  return x == 0 ? 0 : 32 - __builtin_clz(static_cast<uint32_t>(x));
-}
-
-template<>
-inline size_t find_bucket<uint64_t>(uint64_t x, uint64_t last) {
-  x ^= last;
-  return x == 0 ? 0 : 64 - __builtin_clzll(x);
+inline constexpr size_t find_bucket(T x, T last) {
+  // TODO: template meta programming
+  return sizeof(T) == 8 ?
+      (x == last ? 0 : 64 - __builtin_clzll(static_cast<uint64_t>(x ^ last))) :
+      (x == last ? 0 : 32 - __builtin_clz(static_cast<uint32_t>(x ^ last)));
 }
 }  // namespace internal
 
