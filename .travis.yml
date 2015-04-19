@@ -13,8 +13,8 @@ install:
   - if [ "$CXX" = "g++" ]; then sudo apt-get install -qq g++-4.8; fi
   - if [ "$CXX" = "g++" ]; then export CXX="g++-4.8"; fi
   - if [ "$CXX" = "clang++" ]; then sudo apt-get install -qq "libstdc++-4.8-dev"; fi
-  - if [ "$CXX" == "clang++" ]; then sudo apt-get install --allow-unauthenticated -qq clang-3.4; fi
-  - if [ "$CXX" == "clang++" ]; then export CXX="clang++-3.4"; fi
+  - if [ "$CXX" = "clang++" ]; then sudo apt-get install --allow-unauthenticated -qq clang-3.4; fi
+  - if [ "$CXX" = "clang++" ]; then export CXX="clang++-3.4"; fi
 
 script:
   - $CXX -std=c++0x -O3 -Wall -Wextra -pthread -I ./ -I ./test/ test/gtest/gtest*.cc test/radix_heap_test.cc
