@@ -53,7 +53,7 @@ std::cout << h.top_key() << ": " << h.top_value() << std::endl;  // "0.5: hoge"
 
 ### クラス pair_radix_heap
 
-テンプレート引数としてキー（数値）とそれに関連付ける値（なんでも）の型を受け取ります．例えば `pair_radix_heap<int, string>` や `pair_radix_heap<double, std::tuple<int, int, int>>` のように使って下さい．キーとして対応している型は `radix_heap` と同じです．メンバ関数は以下の通りです．
+テンプレート引数としてキー（数値）とそれに関連付ける値（なんでも）の型を受け取ります．例えば `pair_radix_heap<int, std::string>` や `pair_radix_heap<double, std::tuple<int, int, int>>` のように使って下さい．キーとして対応している型は `radix_heap` と同じです．メンバ関数は以下の通りです．
 
 |　返り値 | 関数    | 意味           |
 | ------------- | ------------- | ---- |
