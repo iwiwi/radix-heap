@@ -8,14 +8,16 @@ Radix-Heap
 
 ヘッダ `radix_heap.h` を取り込むだけで利用できます．数値の集合を管理するクラス `radix_heap` と数値（キー）とそれに関連づいた値を管理するクラス `pair_radix_heap` を提供しています．数値は小さい順に出てきます．以下では `pair_radix_heap` の利用例を紹介します．
 
-    #include "radix_heap.h"
-    ...
-    radix_heap::pair_radix_heap<double, std::string> h;  // キーを double, 値を string としたヒープ
-    h.push(0.5, "hoge");
-    h.push(-10, "piyo");
-    std::cout << h.top_key() << ": " << h.top_value() << std::endl;  // "-10: piyo"
-    h.pop();
-    std::cout << h.top_key() << ": " << h.top_value() << std::endl;  // "0.5: hoge"
+```c++
+#include "radix_heap.h"
+...
+radix_heap::pair_radix_heap<double, std::string> h;  // キーを double, 値を string としたヒープ
+h.push(0.5, "hoge");
+h.push(-10, "piyo");
+std::cout << h.top_key() << ": " << h.top_value() << std::endl;  // "-10: piyo"
+h.pop();
+std::cout << h.top_key() << ": " << h.top_value() << std::endl;  // "0.5: hoge"
+```
 
 ## もう少し詳しい説明
 
