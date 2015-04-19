@@ -15,6 +15,29 @@ inline constexpr size_t num_bits() {
   return sizeof(T) * CHAR_BIT;
 }
 
+template<bool Is64bit> class find_bucket_impl;
+
+template<>
+class find_bucket_impl<false> {
+ public:
+  static inline constexpr size_t find_bucket(uint32_t x, uint32_t last) {
+    return x == last ? 0 : 32 - __builtin_clz(x ^ last);
+  }
+};
+
+template<>
+class find_bucket_impl<true> {
+ public:
+  static inline constexpr size_t find_bucket(uint64_t x, uint64_t last) {
+    return x == last ? 0 : 64 - __builtin_clzll(x ^ last);
+  }
+};
+
+template<typename T>
+inline constexpr size_t find_bucket(T x, T last) {
+  return find_bucket_impl<sizeof(T) == 8>::find_bucket(x, last);
+}
+
 template<typename KeyType, bool IsSigned> class encoder_impl_integer;
 
 template<typename KeyType>
@@ -82,20 +105,10 @@ public:
 
 template<typename KeyType>
 class encoder : public encoder_impl_integer<KeyType, std::is_signed<KeyType>::value> {};
-
 template<>
 class encoder<float> : public encoder_impl_decimal<float, uint32_t> {};
-
 template<>
 class encoder<double> : public encoder_impl_decimal<double, uint64_t> {};
-
-template<typename T>
-inline constexpr size_t find_bucket(T x, T last) {
-  // TODO: template meta programming
-  return sizeof(T) == 8 ?
-      (x == last ? 0 : 64 - __builtin_clzll(static_cast<uint64_t>(x ^ last))) :
-      (x == last ? 0 : 32 - __builtin_clz(static_cast<uint32_t>(x ^ last)));
-}
 }  // namespace internal
 
 template<typename KeyType, typename EncoderType = internal::encoder<KeyType>>
