@@ -6,7 +6,7 @@ Radix-Heap
 
 * **高速** --- 値の分布によりますが，`std::priority_queue` より速いことが多いと思います．後述の通り，実データを用いた実験では 2 倍近く高速でした．
 * **簡単** --- 1 つのヘッダファイルを include するだけですぐに利用可能です．
-* **安心** --- gcc 4.8 と clang 3.4 の両方でテストをしています (https://travis-ci.org/iwiwi/radix-heap)．
+* **安心** --- gcc 4.8 と clang 3.4 の両方でテストをしています（https://travis-ci.org/iwiwi/radix-heap）．
 
 ## 例による紹介
 
