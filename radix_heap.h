@@ -1,10 +1,12 @@
 #include <algorithm>
+#include <array>
 #include <cassert>
 #include <climits>
 #include <cstdint>
-#include <type_traits>
-#include <vector>
 #include <limits>
+#include <type_traits>
+#include <utility>
+#include <vector>
 
 namespace radix_heap {
 namespace internal {
