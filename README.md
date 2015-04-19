@@ -35,7 +35,7 @@ std::cout << h.top_key() << ": " << h.top_value() << std::endl;  // "0.5: hoge"
 
 理論的な計算量としては，数値のビット数を b として，各要素について O(b) となります（push してから pop されるまで）．より正確には，型のビット数よりも扱う数値の範囲に依存しており，例えば，符号無しの整数型の場合，最大値が 2^k であれば O(k) となります．
 
-実際の性能としては，Dijkstra のアルゴリズムを通じて性能を測定するプログラムを `example/benchmark_dijkstra_main.cc` として用意し，実データを用いた計測結果を `example/README.md` にまとめてあります．順位キューの操作にかかる時間を `std::priority_queue` と比べ最高で 57% 程度に短縮しています．
+実際の性能としては，Dijkstra のアルゴリズムを通じて性能を測定するプログラムを `example/benchmark_dijkstra_main.cc` として用意し，実データを用いた計測結果を `example/README.md` にまとめてあります．この実験では，順位キューの操作にかかる時間を `std::priority_queue` と比べ最高で 57% 程度に短縮しています．
 
 ### クラス radix_heap
 
