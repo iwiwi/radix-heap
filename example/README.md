@@ -22,7 +22,7 @@ We compared our `pair_radix_heap` (denoted as *rheap*) with `std::priority_queue
 * **Workload**: Pure priority queue time consumption using the workload generated from Dijkstra's algorithm
 
 | Graph | #Vertices | #Edges | rheap(overall) | stl(overall) | rheap(workload) | stl(workload) |
-| - |-:|-:|-:|-:|-:|-:|
+| --- | ---:| ---:| ---:| ---:| ---:| ---:|
 | USA-road-d.NY.gr | 264,346 | 733,846 | 0.024032 | 0.027614 | 0.013619 | 0.019662 |
 | USA-road-t.NY.gr | 264,346 | 733,846 | 0.026797 | 0.030916 | 0.014686 | 0.020601 |
 | USA-road-d.BAY.gr | 321,270 | 800,172 | 0.031049 | 0.034741 | 0.015932 | 0.022237 |
