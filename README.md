@@ -2,7 +2,11 @@ Radix-Heap
 ========
 [![Build Status](https://travis-ci.org/iwiwi/radix-heap.svg?branch=master)](https://travis-ci.org/iwiwi/radix-heap)
 
-高速な単調順位キューである基数ヒープ (*radix heap*) の C++ 実装です．テンプレートで記述してあり，符号付き整数，符号無し整数，浮動小数点数を扱うことができます．
+高速な単調順位キューである基数ヒープ (*radix heap*) の C++ 実装です．テンプレートで記述してあり，符号付き整数，符号無し整数，浮動小数点数を扱うことができます．以下の特徴を持っています．
+
+* **高速** --- 値の分布によりますが，`std::priority_queue` より速いことが多いと思います．後述の通り，実データを用いた実験では 2 倍近く高速でした．
+* **簡単** --- 1 つのヘッダファイルを include するだけですぐに利用可能です．
+* **安心** --- gcc 4.8 と clang 3.4 の両方でテストをしています (https://travis-ci.org/iwiwi/radix-heap)．
 
 ## 例による紹介
 
@@ -26,6 +30,12 @@ std::cout << h.top_key() << ": " << h.top_value() << std::endl;  // "0.5: hoge"
 
 ※ここで「取り出す」とはメンバ関数 `pop` 及び `top` （`pair_radix_sort` では `top_key` か `top_value`） を呼び出すことに相当します．
 
+### 基数ヒープとは
+2 進数による数値の表現を利用した単調順位キューです．詳しいデータ構造については参考文献を見て下さい．
+
+理論的な計算量としては，数値のビット数を b として，各要素について O(b) となります（push してから pop されるまで）．より正確には，型のビット数よりも扱う数値の範囲に依存しており，例えば，符号無しの整数型の場合，最大値が 2^k であれば O(k) となります．
+
+実際の性能としては，Dijkstra のアルゴリズムを通じて性能を測定するプログラムを `example/benchmark_dijkstra_main.cc` として用意し，実データを用いた計測結果を `example/README.md` にまとめてあります．順位キューの操作にかかる時間を `std::priority_queue` と比べ最高で 57% 程度に短縮しています．
 
 ### クラス radix_heap
 
