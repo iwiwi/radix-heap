@@ -2,80 +2,103 @@ Radix-Heap
 ========
 [![Build Status](https://travis-ci.org/iwiwi/radix-heap.svg?branch=master)](https://travis-ci.org/iwiwi/radix-heap)
 
-高速な単調順位キューである基数ヒープ (*radix heap*) の C++ 実装です．テンプレートで記述してあり，符号付き整数，符号無し整数，浮動小数点数を扱うことができます．以下の特徴を持っています．
+This library implements a fast monotone priority queue called the *radix heap*.
+It is written as C++ template classes and capable of handling
+signed integers, unsigned integers and floating-point numbers.
 
-* **高速** --- 値の分布によりますが，`std::priority_queue` より速いことが多いと思います．後述の通り，実データを用いた実験では 2 倍近く高速でした．
-* **簡単** --- 1 つのヘッダファイルを include するだけですぐに利用可能です．
-* **安心** --- gcc 4.8 と clang 3.4 の両方でテストをしています (https://travis-ci.org/iwiwi/radix-heap) ．
+### Features
 
-## 例による紹介
+* **Fast** --- It often outperforms `std::priority_queue`.
+As discussed later, it was about *2X faster* in experiments using real workloads.
+* **Easy** --- The implementation is in a single header file.
+* **Tested** -- It is unit-tested with gcc 4.8 and clang 3.4 (https://travis-ci.org/iwiwi/radix-heap).
 
-ヘッダ `radix_heap.h` を取り込むだけで利用できます．数値の集合を管理するクラス `radix_heap` と数値（キー）とそれに関連づいた値を管理するクラス `pair_radix_heap` を提供しています．数値は小さい順に出てきます．以下では `pair_radix_heap` の利用例を紹介します．
+
+## Quick Introduction
+
+One can start using by just including header `radix_heap.h`,
+which offers the following two classes:
+class `radix_heap` manages a set of numbers,
+and class `pair_radix_heap` manages a set of numbers (*keys*)
+and *values* that are associated to keys.
+
+### Example
 
 ```c++
 #include "radix_heap.h"
 ...
-radix_heap::pair_radix_heap<double, std::string> h;  // キーを double, 値を string としたヒープ
-h.push(0.5, "hoge");
-h.push(-10, "piyo");
-std::cout << h.top_key() << ": " << h.top_value() << std::endl;  // "-10: piyo"
+radix_heap::pair_radix_heap<double, std::string> h;  // a radix heap where the types of keys and values are double and strings, respectively.
+h.push(0.5, "foo");
+h.push(-10, "bar");
+std::cout << h.top_key() << ": " << h.top_value() << std::endl;  // "-10: foo"
 h.pop();
-std::cout << h.top_key() << ": " << h.top_value() << std::endl;  // "0.5: hoge"
+std::cout << h.top_key() << ": " << h.top_value() << std::endl;  // "0.5: bar"
 ```
 
-## もう少し詳しい説明
+## Detailed Description
 
-### 単調順位キューとは
-基数ヒープは単調順位キュー (*monotone priority queue*) の一種です．単調順位キューとは，順位キューであって，「追加できる数値は最後に取り出した数値以上のものに限られる」という制約を持つものです．グラフの最短経路を計算する Dijkstra のアルゴリズムなどで利用することができます．
+### Monotone Priority Queue?
+The radix heap is a *monotone priority queue*.
+A monotone priority queue is a priority queue
+with the restriction that
+a key cannot be pushed if it is less than the last key extracted from the queue.
+Monotone priority queue can be used in many algorithms
+such as Dijkstra's shortest-path algorithm.
 
-※ここで「取り出す」とはメンバ関数 `pop` 及び `top` （`pair_radix_sort` では `top_key` か `top_value`） を呼び出すことに相当します．
+(In this implementation, the word 'extract' above corresponds
+calling member functions `pop`, `top`, `top_key` or `top_value`.)
 
-### 基数ヒープとは
-2 進数による数値の表現を利用した単調順位キューです．詳しいデータ構造については参考文献を見て下さい．
 
-理論的な計算量としては，数値のビット数を b として，各要素について O(b) となります（push してから pop されるまで）．より正確には，型のビット数よりも扱う数値の範囲に依存しており，例えば，符号無しの整数型の場合，最大値が 2^k であれば O(k) となります．
+### Radix Heap?
+The *radix heap* is a monotone priority queue
+using binary representation of numbers. Please see the paper below for details.
 
-実際の性能としては，Dijkstra のアルゴリズムを通じて性能を測定するプログラムを `example/benchmark_dijkstra_main.cc` として用意し，実データを用いた計測結果を `example/README.md` にまとめてあります．この実験では，順位キューの操作にかかる時間を `std::priority_queue` と比べ最高で 57% 程度に短縮しています．
+In theory, it takes O(b) amortized time for each item in total, where b is the number of bits representing keys.
+More precisely, it rather depends on the ranges of keys; for example, if keys are unsigned integers less than 2^k, it becomes O(k) amortized time.
 
-### クラス radix_heap
+In practice, see the experimental results summarized in `example/README.md`. Workloads from Dijkstra's shortest-path algorithm against real road networks are used (see `example/benchmark_dijkstra_main.cc` for details). The results show that this radix heap implementation is about 2X faster than `std_priority_queue` at maximum.
 
-テンプレート引数としてキー（数値）の型を受け取ります．例えば `radix_heap<int>` や `radix_heap<double>` のようにして使って下さい．符号付き整数 (char, short, int, long, long long)，符号無し整数 (unsigned をつけたもの)，浮動小数点数 (float, double) に対応しています．メンバ関数は以下の通りです．
 
-|　返り値 | 関数    | 意味           |
+### Class radix_heap
+
+It takes the type of keys (numbers) as a template argument, e.g., `radix_heap<int>` or `radix_heap<double>`.
+It can handle signed integers (char, short, int, long, longlong), unsigned integers, and floating-point numbers (float, double). Its member functions are as follows:
+
+|　Return value | Name    | Description           |
 | ------------- | ------------- | ---- |
-| bool | empty();   | 空なら `true` |
-| size_t | size();   | 含んでいる要素数 |
-| *キーの型* | top(); | 最小のキー |
-| void | push(キー); | 要素を追加       |
-| void | pop(); | 最小の要素を削除 |
-| void | swap(別のヒープ); | 中身を交換      |
+| bool | empty();   | `true` if empty. |
+| size_t | size();   | The number of keys. |
+| *Key type* | top(); | The minimum key. |
+| void | push(key); | Add a key.       |
+| void | pop(); | Remove the minimum key. |
+| void | swap(another radix heap); | Swap the contents.      |
 
 
-### クラス pair_radix_heap
+### Class pair_radix_heap
 
-テンプレート引数としてキー（数値）とそれに関連付ける値（なんでも）の型を受け取ります．例えば `pair_radix_heap<int, std::string>` や `pair_radix_heap<double, std::tuple<int, int, int>>` のように使って下さい．キーとして対応している型は `radix_heap` と同じです．メンバ関数は以下の通りです．
+It takes two template arguments: the types of keys (numbers) and values (anything that can be moved),
+e.g., `pair_radix_heap<int, std::string>` or `pair_radix_heap<double, std::tuple<int, int, int>>`. Its member functions are as follows:
 
-|　返り値 | 関数    | 意味           |
+|　Return value | Name    | Description           |
 | ------------- | ------------- | ---- |
-| bool | empty();   | 空なら `true` |
-| size_t | size();   | 含んでいる要素数 |
-| *キーの型* | top_key(); | 最小のキー |
-| *値の型* | top_value(); | 最小のキーに関連づいている値 |
-| void | push(キー, 値); | 要素を追加       |
-| void | emplace(キー, ...); | 要素を in-place で構築して追加      |
-| void | pop(); | 最小の要素を削除 |
-| void | swap(別のヒープ); | 中身を交換      |
+| bool | empty();   | `true` if empty. |
+| size_t | size();   | The number of pairs. |
+| *Key type* | top_key(); | The minimum key. |
+| *Value type* | top_value(); | The value of a pair with the minimum key. |
+| void | push(key, value); | Add a pair.       |
+| void | emplace(key, ...); | Construct and add a pair in place. |
+| void | pop(); | Remove a pair with the minimum key. |
+| void | swap(another radix heap); | Swap the contents.       |
 
 
-## 参考文献
+## Reference
 * Ravindra K. Ahuja, Kurt Mehlhorn, James Orlin, and Robert E. Tarjan. **Faster algorithms for the shortest path problem.** *J. ACM 37, 2 (April 1990), 213-223.*
-* **ダイクストラ法の高速化いろいろ** (http://www.slideshare.net/yosupo/ss-46612984)
 
-## ライセンス
+## Licence
 
 The MIT License (MIT)
 
-Copyright (c) 2014 Takuya Akiba
+Copyright (c) 2015 Takuya Akiba
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 
