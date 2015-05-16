@@ -10,11 +10,6 @@
 
 namespace radix_heap {
 namespace internal {
-template<typename T>
-inline constexpr size_t num_bits() {
-  return sizeof(T) * CHAR_BIT;
-}
-
 template<bool Is64bit> class find_bucket_impl;
 
 template<>
@@ -63,12 +58,12 @@ class encoder_impl_integer<KeyType, true> {
 
   inline static constexpr unsigned_key_type encode(key_type x) {
     return static_cast<unsigned_key_type>(x) ^
-        (unsigned_key_type(1) << unsigned_key_type(num_bits<unsigned_key_type>() - 1));
+        (unsigned_key_type(1) << unsigned_key_type(std::numeric_limits<unsigned_key_type>::digits - 1));
   }
 
   inline static constexpr key_type decode(unsigned_key_type x) {
     return static_cast<key_type>
-        (x ^ (unsigned_key_type(1) << (num_bits<unsigned_key_type>() - 1)));
+        (x ^ (unsigned_key_type(1) << (std::numeric_limits<unsigned_key_type>::digits - 1)));
   }
 };
 
@@ -80,14 +75,14 @@ public:
 
   inline static constexpr unsigned_key_type encode(key_type x) {
     return raw_cast<key_type, unsigned_key_type>(x) ^
-        ((-(raw_cast<key_type, unsigned_key_type>(x) >> (num_bits<unsigned_key_type>() - 1))) |
-         (unsigned_key_type(1) << (num_bits<unsigned_key_type>() - 1)));
+        ((-(raw_cast<key_type, unsigned_key_type>(x) >> (std::numeric_limits<unsigned_key_type>::digits - 1))) |
+         (unsigned_key_type(1) << (std::numeric_limits<unsigned_key_type>::digits - 1)));
   }
 
   inline static constexpr key_type decode(unsigned_key_type x) {
     return raw_cast<unsigned_key_type, key_type>
-        (x ^ (((x >> (num_bits<unsigned_key_type>() - 1)) - 1) |
-              (unsigned_key_type(1) << (num_bits<unsigned_key_type>() - 1))));
+        (x ^ (((x >> (std::numeric_limits<unsigned_key_type>::digits - 1)) - 1) |
+              (unsigned_key_type(1) << (std::numeric_limits<unsigned_key_type>::digits - 1))));
   }
 
  private:
@@ -168,9 +163,9 @@ class radix_heap {
   size_t size_;
   unsigned_key_type last_;
   std::array<std::vector<unsigned_key_type>,
-             internal::num_bits<unsigned_key_type>() + 1> buckets_;
+             std::numeric_limits<unsigned_key_type>::digits + 1> buckets_;
   std::array<unsigned_key_type,
-             internal::num_bits<unsigned_key_type>() + 1> buckets_min_;
+             std::numeric_limits<unsigned_key_type>::digits + 1> buckets_min_;
 
   void pull() {
     assert(size_ > 0);
@@ -273,9 +268,9 @@ class pair_radix_heap {
   size_t size_;
   unsigned_key_type last_;
   std::array<std::vector<std::pair<unsigned_key_type, value_type>>,
-             internal::num_bits<unsigned_key_type>() + 1> buckets_;
+             std::numeric_limits<unsigned_key_type>::digits + 1> buckets_;
   std::array<unsigned_key_type,
-             internal::num_bits<unsigned_key_type>() + 1> buckets_min_;
+             std::numeric_limits<unsigned_key_type>::digits + 1> buckets_min_;
 
   void pull() {
     assert(size_ > 0);
